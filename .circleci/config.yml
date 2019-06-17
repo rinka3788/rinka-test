@@ -1,0 +1,70 @@
+version: 2
+
+anchors:
+  - &test
+    steps:
+      - checkout
+      - run:
+          name: ecr login
+          command: |
+            sudo pip install awscli
+            sudo apt install -y jq
+            echo '{"Comment":"テスト用 echoback (input -> output) するだけの StateMachine","StartAt":"PassState","States":{"PassState":{"Type":"Pass","End":true}}}' | jq 
+  - &plan
+    docker:
+      - image: hashicorp/terraform:0.11.11
+    steps:
+      - checkout
+      - run:
+          name: plan
+          command: |
+            export AWS_ACCESS_KEY_ID=$(eval echo $AWS_ACCESS_KEY)
+            export AWS_SECRET_ACCESS_KEY=$(eval echo $AWS_SECRET_KEY)
+            echo "aws_access_key_id = ${AWS_STG_ACCESS_KEY}" >> ./credentials
+            echo "aws_secret_access_key = ${AWS_STG_SECRET_KEY}" >> ./credentials
+            terraform init -backend-config="bucket=$(eval echo $AWS_BUCKET_NAME)"
+            terraform plan -var "anaccesskey=${AWS_STG_ACCESS_KEY}" -var "asecretkey=${AWS_STG_SECRET_KEY}"
+  - &provisioning
+    docker:
+      - image: hashicorp/terraform:0.11.11
+    steps:
+      - checkout
+      - run:
+          name: provisioning
+          command: |
+            [[ "$CIRCLE_PULL_REQUEST" ]] && exit 0
+            export AWS_ACCESS_KEY_ID=$(eval echo $AWS_PRD_ACCESS_KEY)
+            export AWS_SECRET_ACCESS_KEY=$(eval echo $AWS_PRD_SECRET_KEY)
+            terraform init -backend-config="bucket=$(eval echo $AWS_BUCKET_NAME)"
+            terraform apply -auto-approve -var "anaccesskey=${AWS_STG_ACCESS_KEY}" -var "asecretkey=${AWS_STG_SECRET_KEY}"
+
+jobs:
+  plan_prd:
+    <<: *plan
+    environment:
+      AWS_ACCESS_KEY: $AWS_PRD_ACCESS_KEY
+      AWS_SECRET_KEY: $AWS_PRD_SECRET_KEY
+      AWS_BUCKET_NAME: $AWS_PRD_BUCKET_NAME
+
+  provisioning_prd:
+    <<: *provisioning
+    environment:
+      AWS_ACCESS_KEY: $AWS_PRD_ACCESS_KEY
+      AWS_SECRET_KEY: $AWS_PRD_SECRET_KEY
+      AWS_BUCKET_NAME: $AWS_PRD_BUCKET_NAME
+  test:
+    <<: *test
+    docker:
+      - image: circleci/python:3
+
+workflows:
+  version: 2
+  provisioning:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+            branches:
+              only:
+                - master
