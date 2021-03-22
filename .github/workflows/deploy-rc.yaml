@@ -36,5 +36,5 @@ jobs:
       - name: Push images to GCR
         run: |
           docker push $IMAGE_PATH:${GITHUB_SHA}
-
+          docker push $IMAGE_PATH:${GITHUB_REF##*/}
 
