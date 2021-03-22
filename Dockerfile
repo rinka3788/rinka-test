@@ -1,4 +1,5 @@
 FROM nginx
 USER root
-RUN apk --no-cache add --update git
-RUN apk --no-cache add --update jq
+RUN mkdir -p /opt/test
+RUN chmod 755 /opt/test
+RUN chown -R root:root /opt/test
