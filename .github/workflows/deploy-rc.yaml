@@ -2,8 +2,6 @@ name: Build images and push
 
 on:
   push:
-    tags:
-      - 'v*'
     branches:
       - master
 
