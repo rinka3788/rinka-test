@@ -3,7 +3,7 @@ name: Build TAG images and push
 on:
   push:
     tags:
-      - 'v*.*'
+      - 'v[0-9]+.[0-9]+'
 
 env:
   SERVICE_NAME: pf-authentication-service
