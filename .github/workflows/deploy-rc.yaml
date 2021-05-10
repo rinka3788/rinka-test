@@ -14,7 +14,6 @@ jobs:
 
       - name: env check
         run: |
-          BEFORE_SHA=$(jq -r $GITHUB_EVENT_PATH)
-          echo ${BEFORE_SHA}
+          cat $GITHUB_EVENT_PATH
 
 
