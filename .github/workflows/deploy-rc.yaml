@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
+        with:
+          fetch-depth: 0
       - name: env check
         run: |
           BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
