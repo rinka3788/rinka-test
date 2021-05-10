@@ -15,7 +15,9 @@ jobs:
       - name: env check
         run: |
           BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
+          echo ${BEFORE_SHA} 
           AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
+          echo ${AFTER_SHA} 
           git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} 
 
 
