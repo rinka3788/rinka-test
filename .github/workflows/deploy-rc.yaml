@@ -1,13 +1,9 @@
 name: Build images and push
 
 on:
-  push:
+  pull_request:
     branches:
       - master
-
-env:
-  SERVICE_NAME: pf-authentication-service
-  IMAGE_PATH: asia.gcr.io/pf-msa-labo/nginx
 
 jobs:
   push-container-images-rc:
@@ -16,23 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Build docker image
+      - name: env check
         run: |
-          docker build -t ${SERVICE_NAME}:${GITHUB_SHA} ./
-      - name: Tag docker image
-        run: |
-          docker tag ${SERVICE_NAME}:${GITHUB_SHA} $IMAGE_PATH:${GITHUB_SHA}
-          docker tag ${SERVICE_NAME}:${GITHUB_SHA} $IMAGE_PATH:${GITHUB_REF##*/}
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-        with:
-          service_account_key: ${{ secrets.GCP_SA_KEY_DEV }}
-          project_id: ${{ secrets.GCR_PROJECT_DEV }}
+          BEFORE_SHA=$(jq -r $GITHUB_EVENT_PATH)
+          echo ${BEFORE_SHA}
 
-      - name: Authenticate cloud SDK
-        run: gcloud --quiet auth configure-docker
-
-      - name: Push images to GCR
-        run: |
-          docker push $IMAGE_PATH:${GITHUB_SHA}
-          docker push $IMAGE_PATH:${GITHUB_REF##*/}
 
