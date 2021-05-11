@@ -13,12 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+      - uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          token: ${{ secrets.TOKEN }}
-          title: "Auto Release PR"
-          branch: release/stg
-          base: stg
-          body: "AAAAA"
-
+          branch: 'release/test'
