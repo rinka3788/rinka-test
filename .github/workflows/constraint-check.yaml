@@ -7,7 +7,7 @@ on:
       - rc
       - stg
     paths-ignore:
-      - .github/*
+      - .github
 
 jobs:
   pr-check:
