@@ -1,4 +1,4 @@
-name: Build images and push
+name: PR constraint check
 
 on:
   pull_request:
@@ -6,6 +6,8 @@ on:
       - master
       - rc
       - stg
+    paths-ignore:
+      - .github
 
 jobs:
   pr-check:
