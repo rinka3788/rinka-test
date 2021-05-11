@@ -17,9 +17,8 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.TOKEN }}
-          title: Auto Release PR
+          title: "Auto Release PR"
           branch: release/stg
           base: stg
-          title: "Release"
           body: "AAAAA"
 
