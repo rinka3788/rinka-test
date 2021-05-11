@@ -19,6 +19,9 @@ jobs:
           fetch-depth: 0
       - name: check
         run: |
+          echo ${GITHUB_ACTION} 
+          echo ${GITHUB_JOB} 
+          echo ${GITHUB_SHA} 
           BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
           echo ${BEFORE_SHA} 
           AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
