@@ -13,15 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          ref: master
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.TOKEN }}
           title: Auto Release PR
-          branch: test
-          branch-suffix: timestamp
+          branch: release/stg
           base: stg
+          title: "Release"
+          body: "AAAAA"
 
