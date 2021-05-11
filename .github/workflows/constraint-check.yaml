@@ -4,16 +4,18 @@ on:
   pull_request:
     branches:
       - master
+      - rc
+      - stg
 
 jobs:
   pr-check:
-    name: "commit dir check"
+    name: "PR constraint check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: env check
+      - name: check
         run: |
           BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
           echo ${BEFORE_SHA} 
@@ -25,14 +27,14 @@ jobs:
           echo ${COMMIT_MANIFEST_TYPE_COUNT} 
           COMMIT_ENVIROMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
           echo ${COMMIT_ENVIROMENT_COUNT} 
-          if [ ${COMMIT_DIR_COUNT} -ne 2 ]; then
+          if [ ${COMMIT_DIR_COUNT} -ne 1 ]; then
             echo "Commit constraint violation : The project limit to commit is one."
             exit 1
           elif [ ${COMMIT_MANIFEST_TYPE_COUNT} -ne 1 ]; then
-            echo "test"
+            echo "Commit constraint violation : There is only one manifest type to change."
             exit 1
           elif [ ${COMMIT_ENVIROMENT_COUNT} -ne 1 ]; then
-            echo "AAAAA"
+            echo "Commit constraint violation : Only one environment can be changed."
             exit 1
           fi
 
