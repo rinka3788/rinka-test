@@ -25,7 +25,7 @@ jobs:
           echo ${COMMIT_MANIFEST_TYPE_COUNT} 
           COMMIT_ENVIROMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
           echo ${COMMIT_ENVIROMENT_COUNT} 
-          if ${COMMIT_DIR_COUNT} -ne 1 ; then
+          if ${COMMIT_DIR_COUNT} -ne 2 ; then
             echo "Commit constraint violation : The project limit to commit is one."
             exit 1
           elif ${COMMIT_MANIFEST_TYPE_COUNT} -ne 1 ; then
