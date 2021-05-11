@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  push-container-images-rc:
-    name: "Push container images"
+  pr-check:
+    name: "commit dir check"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,6 +19,18 @@ jobs:
           echo ${BEFORE_SHA} 
           AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
           echo ${AFTER_SHA} 
-          git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} 
+          COMMIT_DIR_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $1}' | uniq | wc -l)
+          COMMIT_MANIFEST_TYPE_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq | wc -l)
+          COMMIT_ENVIROMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
+          if ${COMMIT_DIR_COUNT} -ne 1 ; then
+            echo "Commit constraint violation : The project limit to commit is one."
+            exit 1
+          elif ${COMMIT_MANIFEST_TYPE_COUNT} -ne 1 ; then
+            echo "test"
+            exit 1
+          elif ${COMMIT_ENVIROMENT_COUNT} -ne 1 ; then
+            echo "AAAAA"
+            exit 1
+          fi
 
 
