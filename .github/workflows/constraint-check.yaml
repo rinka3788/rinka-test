@@ -26,7 +26,8 @@ jobs:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
           curl -X POST \
-             -H "Authorization: token ${GITHUB_TOKEN}" \
+             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+             -H 'content-type: application/json' \
              -d "{\"body\": \"${{ steps.check.outputs.pr-comment }} \"}" \
              ${URL}
 
