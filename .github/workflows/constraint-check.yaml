@@ -10,6 +10,7 @@ on:
 jobs:
   pr-check:
     name: "PR constraint check"
+    if: ! contains(github.head_ref, 'maintenance/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
