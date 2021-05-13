@@ -11,9 +11,9 @@ runs:
       run: |
         echo "${GITHUB_EVENT_PATH}"
         cat ${GITHUB_EVENT_PATH}
-        BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
+        BEFORE_SHA=$(jq -r '.pull_request.base.sha' $GITHUB_EVENT_PATH)
         echo "BEFORE_SHA: ${BEFORE_SHA}"
-        AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
+        AFTER_SHA=$(jq -r '.pull_request.head.sha' $GITHUB_EVENT_PATH)
         echo "AFTER_SHA: ${AFTER_SHA}"
         COMMIT_DIR_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $1}' | uniq | wc -l)
         echo "COMMIT_DIR_COUNT: ${COMMIT_DIR_COUNT}"
