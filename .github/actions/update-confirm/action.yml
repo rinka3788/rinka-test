@@ -10,6 +10,7 @@ runs:
       shell: bash
       run: |
         echo "${GITHUB_EVENT_PATH}"
+        cat ${GITHUB_EVENT_PATH}
         BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
         echo "BEFORE_SHA: ${BEFORE_SHA}"
         AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
