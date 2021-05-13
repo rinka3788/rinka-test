@@ -20,6 +20,7 @@ jobs:
         id: check
         uses: ./.github/actions/update-confirm
       - name: Post comments
+        if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           URL: ${{ github.event.pull_request.comments_url }}
