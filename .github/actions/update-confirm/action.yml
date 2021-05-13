@@ -40,7 +40,7 @@ runs:
           exit 1
         else
           COMMIT_ENVIROMENT_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq)
-          COMMIT_COMMENT="OK. (´・ω・`)"
+          COMMIT_COMMENT="OK.  :+1:"
           echo "::set-output name=pr-comment::$COMMIT_COMMENT"
           echo "::set-output name=manifest-env::$COMMIT_ENVIROMENT_NAME"
           echo "AAAA ${COMMIT_COMMENT}"
