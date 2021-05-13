@@ -9,6 +9,8 @@ runs:
     - id: check
       shell: bash
       run: |
+        echo "${GITHUB_EVENT_PATH}"
+        cat ${GITHUB_EVENT_PATH}
         BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
         echo "BEFORE_SHA: ${BEFORE_SHA}"
         AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
@@ -32,6 +34,3 @@ runs:
           COMMIT_ENVIROMENT_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq)
           echo "::set-output name=manifest-env::$COMMIT_ENVIROMENT_NAME"
         fi
-
-
-        
