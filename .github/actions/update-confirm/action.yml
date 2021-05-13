@@ -4,7 +4,7 @@ outputs:
     value: ${{ steps.check.outputs.manifest-env }}
   pr-comment:
     description: "Output of the content to comment on PR."
-    value: ${{ steps.check.outputs.manifest-env }}
+    value: ${{ steps.check.outputs.pr-comment}}
 
 runs:
   using: "composite"
