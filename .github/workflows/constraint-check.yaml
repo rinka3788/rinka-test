@@ -17,6 +17,18 @@ jobs:
         with:
           fetch-depth: 0
       - name: check
+        id: check
         uses: ./.github/actions/update-confirm
-
+      - name: Post comments
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          URL: ${{ github.event.pull_request.comments_url }}
+        run: |
+          echo "${{ steps.check.outputs.pr-comment }}"
+          curl -X POST \
+             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+             -H 'content-type: application/json' \
+             -d "{\"body\": \"${{ steps.check.outputs.pr-comment }} \"}" \
+             ${URL}
 
