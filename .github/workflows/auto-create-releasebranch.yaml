@@ -16,24 +16,16 @@ jobs:
         run: |
           U_TIME=$(date +%s%3N)
           echo "::set-output name=u_time::$U_TIME"
-      - id: release_target
-        name: Get Release Target branch
-        run: |
-          GET_BRANCH=${GITHUB_REF#refs/heads/}
-          echo ${GET_BRANCH}
-          elif [ ${GET_BRANCH} == "master" ]; then
-            TARGET_BRANCH="stg"
-          elif [ ${GET_BRANCH} == "rc" ]; then
-            TARGET_BRANCH="stg"
-          elif [ ${GET_BRANCH} == "stg" ]; then
-            TARGET_BRANCH="master"
-          else
-            echo "CI is running from an untargeted branch."
-            exit 1
-          fi
-          echo "::set-output name=r_branch::$TARGET_BRANCH"
-      - uses: peterjgrainger/action-create-branch@v2.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      - name: check
+        id: check
+        uses: ./.github/actions/update-confirm
+      - uses: actions/checkout@v2
         with:
-          branch: 'release/${{ steps.release_target.outputs.r_branch }}-${{ steps.unix_time.outputs.u_time }}'
+          ref: stg
+      - name: Get Release Target branch
+        run: |
+          pwd
+          git branch
+          
+
+

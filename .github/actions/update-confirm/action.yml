@@ -1,10 +1,16 @@
 outputs:
   update-manifest-env:
     description: "Output the environment of the committed manifest."
-    value: ${{ steps.check.outputs.manifest-env }}
-  pr-comment:
-    description: "Output of the content to comment on PR."
-    value: ${{ steps.check.outputs.pr-comment}}
+    value: ${{steps.check.outputs.manifest-env}}
+  commit-dir-count:
+    description: "Count of committed projects"
+    value: ${{steps.check.outputs.commit-dir-count}}
+  commit-manifest-type:
+    description: "Manifest type to update. base or overlay"
+    value: ${{steps.check.outputs.commit-manifest-type}}
+  commit-environment-count:
+    description: "Count of environments to update"
+    value: ${{steps.check.outputs.commit-environment-count}}
 
 runs:
   using: "composite"
@@ -13,6 +19,7 @@ runs:
       shell: bash
       run: |
         echo "${GITHUB_EVENT_PATH}"
+        cat ${GITHUB_EVENT_PATH}
         BEFORE_SHA=$(jq -r '.pull_request.base.sha' $GITHUB_EVENT_PATH)
         echo "BEFORE_SHA: ${BEFORE_SHA}"
         AFTER_SHA=$(jq -r '.pull_request.head.sha' $GITHUB_EVENT_PATH)
@@ -21,23 +28,11 @@ runs:
         echo "COMMIT_DIR_COUNT: ${COMMIT_DIR_COUNT}"
         COMMIT_MANIFEST_TYPE_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq | wc -l)
         echo "COMMIT_MANIFEST_TYPE_COUNT: ${COMMIT_MANIFEST_TYPE_COUNT}"
-        COMMIT_ENVIROMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
-        echo "COMMIT_ENVIROMENT_COUNT: ${COMMIT_ENVIROMENT_COUNT}"
-        if [ ${COMMIT_DIR_COUNT} -ne 1 ]; then
-          COMMIT_COMMENT="Commit constraint violation : The project limit to commit is one."
-          echo "::set-output name=pr-comment::$COMMIT_COMMENT"
-          exit 1
-        elif [ ${COMMIT_MANIFEST_TYPE_COUNT} -ne 1 ]; then
-          COMMIT_COMMENT="Commit constraint violation : There is only one manifest type to change."
-          echo "::set-output name=pr-comment::$COMMIT_COMMENT"
-          exit 1
-        elif [ ${COMMIT_ENVIROMENT_COUNT} -ne 1 ]; then
-          COMMIT_COMMENT="Commit constraint violation : Only one environment can be changed."
-          echo "::set-output name=pr-comment::$COMMIT_COMMENT"
-          exit 1
-        else
-          COMMIT_ENVIROMENT_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq)
-          COMMIT_COMMENT="OK.  :+1:"
-          echo "::set-output name=pr-comment::$COMMIT_COMMENT"
-          echo "::set-output name=manifest-env::$COMMIT_ENVIROMENT_NAME"
-        fi
+        COMMIT_ENVIRONMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
+        echo "COMMIT_ENVIRONMENT_COUNT: ${COMMIT_ENVIRONMENT_COUNT}"
+        echo "::set-output name=commit-dir-count::$COMMIT_DIR_COUNT"
+        echo "::set-output name=commit-manifest-type::$COMMIT_MANIFEST_TYPE_COUNT"
+        echo "::set-output name=commit-environment-count::$COMMIT_ENVIRONMENT_COUNT"
+        COMMIT_ENVIRONMENT_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq)
+        echo "::set-output name=manifest-env::$COMMIT_ENVIRONMENT_NAME"
+
