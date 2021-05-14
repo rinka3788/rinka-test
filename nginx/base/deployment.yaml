@@ -1,0 +1,60 @@
+asf@lajskfjasfj11111111111apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pf-microservices-template-first
+  labels:
+    service: pf-microservices-template-first
+    tags.datadoghq.com/service: pf-microservices-template-first
+    tags.datadoghq.com/version: "1.0"
+spec:
+  selector:
+    matchLabels:
+      service: pf-microservices-template-first
+  template:
+    metadata:
+      labels:
+        service: pf-microservices-template-first
+        tags.datadoghq.com/service: pf-microservices-template-first
+        tags.datadoghq.com/version: "1.0"
+    spec:
+      containers:
+        - name: server
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+            - name: DD_TRACE_ANALYTICS_ENABLED
+              value: "true"
+試験的なものです
+テスト用2

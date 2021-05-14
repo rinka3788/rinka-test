@@ -1,0 +1,22 @@
+name: Auto Release PR create
+
+on:
+  push:
+    branches:
+      - release/stg/11111111111
+
+
+jobs:
+  auto-pr-create:
+    name: "Release PR create"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Create Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          title: Auto Release PR
+          destination_branch: stg

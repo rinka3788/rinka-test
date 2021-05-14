@@ -1,0 +1,48 @@
+outputs:
+  update-manifest-env:
+    description: "Output the environment of the committed manifest."
+    value: ${{steps.check.outputs.manifest-env}}
+  commit-dir-count:
+    description: "Count of committed projects"
+    value: ${{steps.check.outputs.commit-dir-count}}
+  commit-manifest-type:
+    description: "Manifest type to update. base or overlay"
+    value: ${{steps.check.outputs.commit-manifest-type}}
+  commit-environment-count:
+    description: "Count of environments to update"
+    value: ${{steps.check.outputs.commit-environment-count}}
+  before-sha:
+    value: ${{steps.check.outputs.before-sha}}
+  after-sha:
+    value: ${{steps.check.outputs.after-sha}}
+runs:
+  using: "composite"
+  steps:
+    - id: check
+      shell: bash
+      run: |
+        echo "${GITHUB_EVENT_PATH}"
+        cat ${GITHUB_EVENT_PATH}
+        BEFORE_SHA=$(jq -r '.pull_request.base.sha' $GITHUB_EVENT_PATH)
+        if [ ${BEFORE_SHA} == "null" ]; then
+          BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
+        fi
+        echo "BEFORE_SHA: ${BEFORE_SHA}"
+        AFTER_SHA=$(jq -r '.pull_request.head.sha' $GITHUB_EVENT_PATH)
+        if [ ${AFTER_SHA} == "null" ]; then
+          AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
+        fi
+        echo "AFTER_SHA: ${AFTER_SHA}"
+        echo "::set-output name=before-sha::$BEFORE_SHA"
+        echo "::set-output name=after-sha::$AFTER_SHA"
+        COMMIT_DIR_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $1}' | uniq | wc -l)
+        echo "COMMIT_DIR_COUNT: ${COMMIT_DIR_COUNT}"
+        COMMIT_MANIFEST_TYPE_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq | wc -l)
+        echo "COMMIT_MANIFEST_TYPE_COUNT: ${COMMIT_MANIFEST_TYPE_COUNT}"
+        COMMIT_ENVIRONMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
+        echo "COMMIT_ENVIRONMENT_COUNT: ${COMMIT_ENVIRONMENT_COUNT}"
+        echo "::set-output name=commit-dir-count::$COMMIT_DIR_COUNT"
+        echo "::set-output name=commit-manifest-type::$COMMIT_MANIFEST_TYPE_COUNT"
+        echo "::set-output name=commit-environment-count::$COMMIT_ENVIRONMENT_COUNT"
+        COMMIT_ENVIRONMENT_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq)
+        echo "::set-output name=manifest-env::$COMMIT_ENVIRONMENT_NAME"
