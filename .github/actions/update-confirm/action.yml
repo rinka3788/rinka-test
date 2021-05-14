@@ -29,7 +29,7 @@ runs:
         if [ ${AFTER_SHA} == "null" ]; then
           AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
         fi
-        git log
+        git diff --name-only ${BEFORE_SHA} ${AFTER_SHA}
         echo "AFTER_SHA: ${AFTER_SHA}"
         COMMIT_DIR_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $1}' | uniq | wc -l)
         echo "COMMIT_DIR_COUNT: ${COMMIT_DIR_COUNT}"
