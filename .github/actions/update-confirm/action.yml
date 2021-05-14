@@ -22,11 +22,13 @@ runs:
         cat ${GITHUB_EVENT_PATH}
         BEFORE_SHA=$(jq -r '.pull_request.base.sha' $GITHUB_EVENT_PATH)
         if [ -z "${BEFORE_SHA}" ]; then
+          echo "TEST ${BEFORE_SHA}"
           BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
         fi
         echo "BEFORE_SHA: ${BEFORE_SHA}"
         AFTER_SHA=$(jq -r '.pull_request.head.sha' $GITHUB_EVENT_PATH)
         if [ -z "${AFTER_SHA}" ]; then
+          echo "TEST ${AFTER_SHA}"
           AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
         fi
         echo "AFTER_SHA: ${AFTER_SHA}"
