@@ -33,7 +33,6 @@ jobs:
           git branch
           git cherry-pick ${{steps.check.outputs.before-sha}}..${{steps.check.outputs.after-sha}}
           git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
-          hub pull-request -b "stg" -h "release/stg/${{steps.unix-time.outputs.u-time}}" -m "\"AUTO: TEST\""
 
 
 
