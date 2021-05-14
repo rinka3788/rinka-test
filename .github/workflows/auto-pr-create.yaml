@@ -1,9 +1,9 @@
-name: Auto PR create
+name: Auto Release PR create
 
 on:
   push:
     branches:
-      - release/stg*
+      - release/stg/11111111111
 
 
 jobs:
@@ -12,10 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:
-          token: ${{ secrets.TOKEN }}
+          github_token: ${{ secrets.TOKEN }}
           title: Auto Release PR
-          branch-suffix: timestamp
-          base: stg
+          destination_branch: stg
