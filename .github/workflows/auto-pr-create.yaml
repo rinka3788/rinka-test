@@ -3,7 +3,7 @@ name: Auto Release PR create
 on:
   push:
     branches:
-      - release/stg/11111111111
+      - release/stg/*
 
 
 jobs:
@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:
