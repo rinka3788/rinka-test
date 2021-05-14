@@ -24,6 +24,8 @@ jobs:
       - name: Get Release Target branch
         run: |
           COMMIT_COUNT=$(jq -r '.commits[].id' $GITHUB_EVENT_PATH | wc -l)
+          git config --global user.email "iwasaki-so@dmm.com"
+          git config --global user.name "MSA-SRE-BOT"
           echo "COMMIT_COUNT: ${COMMIT_COUNT}"
           git remote update
           git fetch --all
