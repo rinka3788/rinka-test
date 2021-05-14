@@ -27,8 +27,10 @@ jobs:
           echo "COMMIT_COUNT: ${COMMIT_COUNT}"
           git remote update
           git fetch --all
-          git checkout -b "release/${{ steps.release_target.outputs.r_branch }}/${{ steps.unix-time.outputs.u-time }}" origin/stg
+          git checkout -b "release/stg/${{steps.unix-time.outputs.u-time}}" origin/stg
           git branch
+          git cherry-pick ${{steps.check.outputs.before-sha}}..${{steps.check.outputs.after-sha}}
+          git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
 
 
 
