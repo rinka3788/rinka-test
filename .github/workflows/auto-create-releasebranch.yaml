@@ -23,7 +23,7 @@ jobs:
         uses: ./.github/actions/update-confirm
       - name: Get Release Target branch
         run: |
-          COMMIT_COUNT=$(jq -r '..commits[].id' $GITHUB_EVENT_PATH | wc -l)
+          COMMIT_COUNT=$(jq -r '.commits[].id' $GITHUB_EVENT_PATH | wc -l)
           echo "COMMIT_COUNT: ${COMMIT_COUNT}"
           git remote update
           git fetch --all
