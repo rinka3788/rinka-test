@@ -3,8 +3,7 @@ name: Auto Release PR create
 on:
   push:
     branches:
-      - release/stg/*
-
+      - release**
 
 jobs:
   auto-pr-create:
