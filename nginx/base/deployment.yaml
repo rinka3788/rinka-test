@@ -56,3 +56,4 @@ spec:
                   fieldPath: metadata.labels['tags.datadoghq.com/version']
             - name: DD_TRACE_ANALYTICS_ENABLED
               value: "true"
+試験的なものです
