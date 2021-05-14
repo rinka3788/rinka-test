@@ -23,12 +23,17 @@ jobs:
         uses: ./.github/actions/update-confirm
       - name: Get Release Target branch
         run: |
-          COMMIT_COUNT=$(jq -r '..commits[].id' $GITHUB_EVENT_PATH | wc -l)
+          COMMIT_COUNT=$(jq -r '.commits[].id' $GITHUB_EVENT_PATH | wc -l)
+          git config --global user.email "iwasaki-so@dmm.com"
+          git config --global user.name "MSA-SRE-BOT"
           echo "COMMIT_COUNT: ${COMMIT_COUNT}"
           git remote update
           git fetch --all
-          git checkout -b "release/${{ steps.release_target.outputs.r_branch }}/${{ steps.unix-time.outputs.u-time }}" origin/stg
+          git checkout -b "release/stg/${{steps.unix-time.outputs.u-time}}" origin/stg
           git branch
+          git cherry-pick ${{steps.check.outputs.before-sha}}..${{steps.check.outputs.after-sha}}
+          git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
+          hub pull-request -b "stg" -h "release/stg/${{steps.unix-time.outputs.u-time}}" -m "\"AUTO: TEST\""
 
 
 
