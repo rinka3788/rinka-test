@@ -11,7 +11,10 @@ outputs:
   commit-environment-count:
     description: "Count of environments to update"
     value: ${{steps.check.outputs.commit-environment-count}}
-
+  before-sha:
+    value: ${{steps.check.outputs.before-sha}}
+  after-sha:
+    value: ${{steps.check.outputs.after-sha}}
 runs:
   using: "composite"
   steps:
@@ -30,6 +33,8 @@ runs:
           AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
         fi
         echo "AFTER_SHA: ${AFTER_SHA}"
+        echo "::set-output name=before-sha::$BEFORE_SHA"
+        echo "::set-output name=after-sha::$AFTER_SHA"
         COMMIT_DIR_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $1}' | uniq | wc -l)
         echo "COMMIT_DIR_COUNT: ${COMMIT_DIR_COUNT}"
         COMMIT_MANIFEST_TYPE_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq | wc -l)

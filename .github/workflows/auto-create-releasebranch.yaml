@@ -13,22 +13,23 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - id: unix_time
+      - id: unix-time
         name: Get Date
         run: |
           U_TIME=$(date +%s%3N)
-          echo "::set-output name=u_time::$U_TIME"
+          echo "::set-output name=u-time::$U_TIME"
       - name: check
         id: check
         uses: ./.github/actions/update-confirm
-      - uses: actions/checkout@v2
-        with:
-          ref: stg
-          fetch-depth: 0
       - name: Get Release Target branch
         run: |
-          pwd
+          COMMIT_COUNT=$(jq -r '..commits[].id' $GITHUB_EVENT_PATH | wc -l)
+          echo "COMMIT_COUNT: ${COMMIT_COUNT}"
+          git remote update
+          git fetch --all
+          git checkout -b "release/${{ steps.release_target.outputs.r_branch }}/${{ steps.unix-time.outputs.u-time }}" origin/stg
           git branch
+
 
 
 
