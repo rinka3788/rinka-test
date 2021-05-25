@@ -31,7 +31,9 @@ jobs:
           git fetch --all
           git checkout -b "release/stg/${{steps.unix-time.outputs.u-time}}" origin/stg
           git branch
+          set +e
           git cherry-pick ${{steps.check.outputs.before-sha}}..${{steps.check.outputs.after-sha}}; CHERRY_PICK_CODE=$?
+          set -e
           if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
             git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
           else
