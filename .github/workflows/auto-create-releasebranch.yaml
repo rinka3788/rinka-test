@@ -47,7 +47,7 @@ jobs:
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.TOKEN }}
-          title: Auto Release PR
+          pr_title: "Release ${{ github.ref }} into STG"
           source_branch: "release/stg/${{steps.unix-time.outputs.u-time}}"
           destination_branch: stg
 
