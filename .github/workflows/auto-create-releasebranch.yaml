@@ -31,8 +31,16 @@ jobs:
           git fetch --all
           git checkout -b "release/stg/${{steps.unix-time.outputs.u-time}}" origin/stg
           git branch
-          git cherry-pick ${{steps.check.outputs.before-sha}}..${{steps.check.outputs.after-sha}}
-          git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
+          git cherry-pick ${{steps.check.outputs.before-sha}}..${{steps.check.outputs.after-sha}}; CHERRY_PICK_CODE=$?
+          if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
+            git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
+          else
+            CONFLICT_LIST=$(git diff --name-only | uniq)
+            git checkout --theirs ${CONFLICT_LIST}
+            git add ${CONFLICT_LIST}
+            git commit -m "$(git log --pretty=oneline ${{steps.check.outputs.after-sha}} | grep -B 10000 ${{steps.check.outputs.before-sha}})"
+            git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
+          fi
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:
