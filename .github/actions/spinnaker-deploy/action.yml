@@ -23,6 +23,8 @@ runs:
         GOOGLE_APPLICATION_CREDENTIALS: "service-account-key.json"
       run: |
         echo "${{ inputs.service_account_key }}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+        gcloud auth print-identity-token
+        echo "test"
         gcloud auth print-identity-token \
             --impersonate-service-account="${{ inputs.impersonate_service_account }}" \
             --audiences="${{ inputs.spinnaker_client_id }}"
