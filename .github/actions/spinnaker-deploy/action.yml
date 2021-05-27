@@ -1,0 +1,35 @@
+inputs:
+  service_account_key:
+    description: 'Service account json key'
+    required: false
+  impersonate_service_account:
+    description: 'Service account that allows token creation'
+    required: false
+  spinnaker_client_id:
+    description: 'IAP Client ID'
+    required: true
+  spinnaker_webhook_url:
+    description: 'URL including the path of the webhook endpoint in Gate'
+    required: true
+  spinnaker_webhook_source:
+    description: 'Spinnaker webhook trigger config source item'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - id: webhook-request
+      shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: "service-account-key.json"
+      run: |
+        echo "${{ inputs.service_account_key }}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+        echo "${{ inputs.spinnaker_webhook_url }}/${INPUT_SPINNAKER_WEBHOOK_SOURCE}"
+        curl ${INPUT_SPINNAKER_WEBHOOK_URL}/${INPUT_SPINNAKER_WEBHOOK_SOURCE} \
+          -X POST \
+          --header "Authorization: Bearer $(gcloud auth print-identity-token \
+            --impersonate-service-account="${INPUT_IMPERSONATE_SERVICE_ACCOUNT}" \
+            --audiences="${INPUT_SPINNAKER_CLIENT_ID}"
+            --include-email \
+            --verbosity=error)" \
+          -H "content-type: application/json" \
+          -d "{ }"
