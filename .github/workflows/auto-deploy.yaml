@@ -21,7 +21,8 @@ jobs:
       - name: check
         id: check
         uses: ./.github/actions/update-confirm
-      - name: spinnaker-deploy-request
+      - name: webhook-request
+        id: webhook-request
         uses: ./.github/actions/spinnaker-deploy
         with:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
