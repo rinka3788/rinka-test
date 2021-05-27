@@ -1,16 +1,22 @@
 outputs:
-  update-manifest-env:
-    description: "Output the environment of the committed manifest."
-    value: ${{steps.check.outputs.manifest-env}}
   commit-dir-count:
     description: "Count of committed projects"
     value: ${{steps.check.outputs.commit-dir-count}}
-  commit-manifest-type:
-    description: "Manifest type to update. base or overlay"
-    value: ${{steps.check.outputs.commit-manifest-type}}
+  commit-dir-name:
+    description: "committed microservices name"
+    value: ${{steps.check.outputs.commit-dir-name}}
+  commit-manifest-type-count:
+    description: "Manifest type to update count"
+    value: ${{steps.check.outputs.commit-manifest-type-count}}
+  commit-manifest-type-name:
+    description: "Manifest type name"
+    value: ${{steps.check.outputs.commit-manifest-type-name}}
   commit-environment-count:
     description: "Count of environments to update"
     value: ${{steps.check.outputs.commit-environment-count}}
+  commit-environment-name:
+    description: "environments name"
+    value: ${{steps.check.outputs.commit-environment-name}}
   before-sha:
     value: ${{steps.check.outputs.before-sha}}
   after-sha:
@@ -35,14 +41,25 @@ runs:
         echo "AFTER_SHA: ${AFTER_SHA}"
         echo "::set-output name=before-sha::$BEFORE_SHA"
         echo "::set-output name=after-sha::$AFTER_SHA"
+        # Number of microservice
         COMMIT_DIR_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq | wc -l)
+        COMMIT_DIR_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq)
         echo "COMMIT_DIR_COUNT: ${COMMIT_DIR_COUNT}"
-        COMMIT_MANIFEST_TYPE_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
-        echo "COMMIT_MANIFEST_TYPE_COUNT: ${COMMIT_MANIFEST_TYPE_COUNT}"
-        COMMIT_ENVIRONMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $5}' | uniq | wc -l)
-        echo "COMMIT_ENVIRONMENT_COUNT: ${COMMIT_ENVIRONMENT_COUNT}"
+        echo "COMMIT_DIR_NAME: ${COMMIT_DIR_NAME}"
         echo "::set-output name=commit-dir-count::$COMMIT_DIR_COUNT"
-        echo "::set-output name=commit-manifest-type::$COMMIT_MANIFEST_TYPE_COUNT"
-        echo "::set-output name=commit-environment-count::$COMMIT_ENVIRONMENT_COUNT"
+        echo "::set-output name=commit-dir-name::$COMMIT_DIR_NAME"
+        # base or overlays
+        COMMIT_MANIFEST_TYPE_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq | wc -l)
+        COMMIT_MANIFEST_TYPE_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $3}' | uniq )
+        echo "COMMIT_MANIFEST_TYPE_COUNT: ${COMMIT_MANIFEST_TYPE_COUNT}"
+        echo "COMMIT_MANIFEST_TYPE_NAME: ${COMMIT_MANIFEST_TYPE_NAME}"
+        echo "::set-output name=commit-manifest-type-count::$COMMIT_MANIFEST_TYPE_COUNT"
+        echo "::set-output name=commit-manifest-type-name::$COMMIT_MANIFEST_TYPE_NAME"
+        # Number of environments
+        COMMIT_ENVIRONMENT_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $4}' | uniq | wc -l)
         COMMIT_ENVIRONMENT_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $4}' | uniq)
-        echo "::set-output name=manifest-env::$COMMIT_ENVIRONMENT_NAME"
+        echo "COMMIT_ENVIRONMENT_COUNT: ${COMMIT_ENVIRONMENT_COUNT}"
+        echo "COMMIT_ENVIRONMENT_NAME: ${COMMIT_ENVIRONMENT_NAME}"
+        echo "::set-output name=commit-environment-count::$COMMIT_ENVIRONMENT_COUNT"
+        echo "::set-output name=commit-environment-name::$COMMIT_ENVIRONMENT_NAME"
+

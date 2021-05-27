@@ -1,10 +1,10 @@
 inputs:
   service_account_key:
     description: 'Service account json key'
-    required: false
+    required: true
   impersonate_service_account:
     description: 'Service account that allows token creation'
-    required: false
+    required: true
   spinnaker_client_id:
     description: 'IAP Client ID'
     required: true
@@ -22,13 +22,12 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "service-account-key.json"
       run: |
-        echo "${{ inputs.service_account_key }}" > ${GOOGLE_APPLICATION_CREDENTIALS}
-        echo "${{ inputs.spinnaker_webhook_url }}/${{ inputs.spinnaker_webhook_source }}"
-        curl ${{ inputs.spinnaker_webhook_url }}/${{ inputs.spinnaker_webhook_source }} \
+        echo "${{inputs.service_account_key}}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+        curl ${{inputs.spinnaker_webhook_url}}/${{inputs.spinnaker_webhook_source}} \
           -X POST \
           --header "Authorization: Bearer $(gcloud auth print-identity-token \
-            --impersonate-service-account="${{ inputs.impersonate_service_account }}" \
-            --audiences="${{ inputs.spinnaker_client_id }}" \
+            --impersonate-service-account="${{inputs.impersonate_service_account}}" \
+            --audiences="${{inputs.spinnaker_client_id}}" \
             --include-email \
             --verbosity=error)" \
           -H "content-type: application/json" \
