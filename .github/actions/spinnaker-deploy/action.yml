@@ -15,7 +15,7 @@ inputs:
     description: 'Spinnaker webhook trigger config source item'
     required: true
 runs:
-  using: "spinnaker-deploy-webhook-request"
+  using: "composite"
   steps:
     - id: webhook-request
       shell: bash
