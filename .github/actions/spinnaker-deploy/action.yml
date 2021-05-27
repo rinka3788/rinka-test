@@ -22,12 +22,12 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "service-account-key.json"
       run: |
-        echo "${{ inputs.service_account_key }}" > ${GOOGLE_APPLICATION_CREDENTIALS}
-        curl ${{ inputs.spinnaker_webhook_url }}/${{ inputs.spinnaker_webhook_source }}
+        echo "${INPUT_SERVICE_ACCOUNT_KEY}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+        curl ${INPUT_SPINNAKER_WEBHOOK_URL}/${INPUT_SPINNAKER_WEBHOOK_SOURCE}
           -X POST \
           --header "Authorization: Bearer $(gcloud auth print-identity-token \
-            --impersonate-service-account="${{ inputs.impersonate_service_account }}" \
-            --audiences="${{ inputs.spinnaker_client_id }}"
+            --impersonate-service-account="${INPUT_IMPERSONATE_SERVICE_ACCOUNT}" \
+            --audiences="${INPUT_SPINNAKER_CLIENT_ID}"
             --include-email \
             --verbosity=error)" \
           -H "content-type: application/json" \
