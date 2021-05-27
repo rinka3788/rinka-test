@@ -23,7 +23,7 @@ runs:
         GOOGLE_APPLICATION_CREDENTIALS: "service-account-key.json"
       run: |
         echo "${INPUT_SERVICE_ACCOUNT_KEY}" > ${GOOGLE_APPLICATION_CREDENTIALS}
-        curl ${INPUT_SPINNAKER_WEBHOOK_URL}/${INPUT_SPINNAKER_WEBHOOK_SOURCE}
+        curl ${INPUT_SPINNAKER_WEBHOOK_URL}/${INPUT_SPINNAKER_WEBHOOK_SOURCE} \
           -X POST \
           --header "Authorization: Bearer $(gcloud auth print-identity-token \
             --impersonate-service-account="${INPUT_IMPERSONATE_SERVICE_ACCOUNT}" \
