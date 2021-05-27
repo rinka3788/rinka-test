@@ -24,7 +24,7 @@ jobs:
       - name: Get Release Target branch
         run: |
           COMMIT_COUNT=$(jq -r '.commits[].id' $GITHUB_EVENT_PATH | wc -l)
-          git config --global user.email "iwasaki-so@dmm.com"
+          git config --global user.email "pf-msa@dmm.com"
           git config --global user.name "MSA-SRE-BOT"
           echo "COMMIT_COUNT: ${COMMIT_COUNT}"
           git remote update
@@ -47,9 +47,9 @@ jobs:
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.TOKEN }}
-          title: Auto Release PR
-          source_branch: "release/stg/${{steps.unix-time.outputs.u-time}}"
-          destination_branch: stg
+          pr_title: "Release ${{ github.ref }} into STG"
+          source_branch: "release/${{steps.check.outputs.commit-environment-name}}/${{steps.unix-time.outputs.u-time}}"
+          destination_branch: "${{steps.check.outputs.commit-environment-name}}"
 
 
 

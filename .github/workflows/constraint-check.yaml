@@ -26,7 +26,7 @@ jobs:
             COMMIT_COMMENT="Commit constraint violation : The project limit to commit is one."
             echo "::set-output name=pr-comment::$COMMIT_COMMENT"
             exit 1
-          elif [ ${{steps.check.outputs.commit-manifest-type}} -ne 1 ]; then
+          elif [ ${{steps.check.outputs.commit-manifest-type-count}} -ne 1 ]; then
             COMMIT_COMMENT="Commit constraint violation : There is only one manifest type to change."
             echo "::set-output name=pr-comment::$COMMIT_COMMENT"
             exit 1
