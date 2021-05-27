@@ -22,8 +22,8 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: "service-account-key.json"
       run: |
-        echo "${INPUT_SERVICE_ACCOUNT_KEY}" > ${GOOGLE_APPLICATION_CREDENTIALS}
-        echo "${INPUT_SPINNAKER_WEBHOOK_URL}/${INPUT_SPINNAKER_WEBHOOK_SOURCE}"
+        echo "${{ inputs.service_account_key }}" > ${GOOGLE_APPLICATION_CREDENTIALS}
+        echo "${{ inputs.spinnaker_webhook_url }}/${INPUT_SPINNAKER_WEBHOOK_SOURCE}"
         curl ${INPUT_SPINNAKER_WEBHOOK_URL}/${INPUT_SPINNAKER_WEBHOOK_SOURCE} \
           -X POST \
           --header "Authorization: Bearer $(gcloud auth print-identity-token \
