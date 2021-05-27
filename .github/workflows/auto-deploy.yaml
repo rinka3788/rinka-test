@@ -1,0 +1,32 @@
+name: Auto Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  auto-deploy:
+    environment: stg
+    name: "Auto Deploy"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT }}
+      - name: check
+        id: check
+        uses: ./.github/actions/update-confirm
+      - name: webhook-request
+        id: webhook-request
+        uses: ./.github/actions/spinnaker-deploy
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          impersonate_service_account: ${{ secrets.GCP_IMPERSONATE_SA }}
+          spinnaker_client_id: ${{ secrets.SPINNAKER_CLIENT_ID }}
+          spinnaker_webhook_url: ${{ secrets.SPINNAKER_URL }}
+          spinnaker_webhook_source: "test"
