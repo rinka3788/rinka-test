@@ -32,10 +32,12 @@ runs:
           set +e
           git cherry-pick ${BEFORE_SHA}..${AFTER_SHA}; CHERRY_PICK_CODE=$?
           set -e
+          echo "CHERRY_PICK_CODE: ${CHERRY_PICK_CODE}"
           if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
             git push origin "${{inputs.cherry_branch_name}}"
           else
             CHERRY_PICK_END_FLAG=0
+            echo "CHERRY_PICK_CODE_FOR: ${CHERRY_PICK_CODE}"
             for i in `seq ${COMMIT_COUNT}`
             do
               if [ ${CHERRY_PICK_END_FLAG} -ne 1 ]; then
