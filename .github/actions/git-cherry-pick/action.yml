@@ -42,12 +42,13 @@ runs:
               if [ ${CHERRY_PICK_END_FLAG} -ne 0 ]; then
                 CONFLICT_LIST=$(git diff --name-only | uniq)
                 CONFLICT_LIST_COUNT=$(git diff --name-only | uniq | wc -l)
+                echo ${CONFLICT_LIST_COUNT}
                 if [ ${CONFLICT_LIST_COUNT} -eq 0 ]; then
                   CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
                 else
                   git checkout --theirs ${CONFLICT_LIST}
                   git add ${CONFLICT_LIST}
-                  git commit -m "$(git log --pretty=oneline ${AFTER_SHA} | grep -B 10000 ${BEFORE_SHA}"
+                  git commit -m "$(git log --pretty=oneline ${AFTER_SHA} | grep -B 10000 ${BEFORE_SHA})"
                   CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
                 fi
               fi
