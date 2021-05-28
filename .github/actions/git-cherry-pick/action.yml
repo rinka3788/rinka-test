@@ -56,4 +56,5 @@ runs:
             done
             git push origin "${{inputs.cherry_branch_name}}"
           fi
+          echo "CHERRY_PICK_CODE_FOR2: ${CHERRY_PICK_CODE}"
           set -e
