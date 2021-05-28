@@ -1,0 +1,54 @@
+inputs:
+  cherry_branch_name:
+    description: 'Cherry pick branch name'
+    required: true
+  push_branch_name:
+    description: 'Push branch name'
+    required: true
+runs:
+  using: "composite"
+  steps:
+      - name: Release branch create
+        run: |
+          COMMIT_COUNT=$(jq -r '.commits[].id' $GITHUB_EVENT_PATH | wc -l)
+          BEFORE_SHA=$(jq -r '.pull_request.base.sha' $GITHUB_EVENT_PATH)
+          if [ ${BEFORE_SHA} == "null" ]; then
+            BEFORE_SHA=$(jq -r '.before' $GITHUB_EVENT_PATH)
+          fi
+          echo "BEFORE_SHA: ${BEFORE_SHA}"
+          AFTER_SHA=$(jq -r '.pull_request.head.sha' $GITHUB_EVENT_PATH)
+          if [ ${AFTER_SHA} == "null" ]; then
+            AFTER_SHA=$(jq -r '.after' $GITHUB_EVENT_PATH)
+          fi
+          echo "AFTER_SHA: ${AFTER_SHA}"
+          git config --global user.email "pf-msa@dmm.com"
+          git config --global user.name "MSA-SRE-BOT"
+          echo "COMMIT_COUNT: ${COMMIT_COUNT}"
+          git remote update
+          git fetch --all
+          git checkout -b "${{inputs.cherry_branch_name}}" origin/${{inputs.push_branch_name}}
+          git branch
+          set +e
+          git cherry-pick ${BEFORE_SHA}..${AFTER_SHA}; CHERRY_PICK_CODE=$?
+          set -e
+          if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
+            git push origin "${{inputs.cherry_branch_name}}"
+          else
+            CHERRY_PICK_END_FLAG=0
+            for i in `seq ${COMMIT_COUNT}`
+            do
+              if [ ${CHERRY_PICK_END_FLAG} -ne 1 ]; then
+                CONFLICT_LIST=$(git diff --name-only | uniq)
+                CONFLICT_LIST_COUNT=$(git diff --name-only | uniq | wc -l)
+                if [ ${CONFLICT_LIST_COUNT} -eq 0 ]; then
+                  CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
+                else
+                  git checkout --theirs ${CONFLICT_LIST}
+                  git add ${CONFLICT_LIST}
+                  git commit -m "$(git log --pretty=oneline ${AFTER_SHA} | grep -B 10000 ${BEFORE_SHA}"
+                  CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
+                fi
+              fi
+            done
+            git push origin "${{inputs.cherry_branch_name}}"
+          fi

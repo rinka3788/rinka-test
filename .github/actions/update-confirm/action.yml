@@ -1,4 +1,10 @@
 outputs:
+  commit-judgment-count:
+    description: "Determine if it is a manifest setting or a repository setting"
+    value: ${{steps.check.outputs.commit-judgment-count}}
+  commit-judgment-name:
+    description: "Determine if it is a manifest setting or a repository setting"
+    value: ${{steps.check.outputs.commit-judgment-name}}
   commit-dir-count:
     description: "Count of committed projects"
     value: ${{steps.check.outputs.commit-dir-count}}
@@ -41,6 +47,13 @@ runs:
         echo "AFTER_SHA: ${AFTER_SHA}"
         echo "::set-output name=before-sha::$BEFORE_SHA"
         echo "::set-output name=after-sha::$AFTER_SHA"
+        # Judgment of commit to microservices
+        COMMIT_JUDGMENT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $1}' | uniq | wc -l)
+        COMMIT_JUDGMENT_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $1}' | uniq)
+        echo "COMMIT_JUDGMENT: ${COMMIT_JUDGMENT}"
+        echo "COMMIT_JUDGMENT_NAME: ${COMMIT_JUDGMENT_NAME}"
+        echo "::set-output name=commit-judgment-count::$COMMIT_JUDGMENT"
+        echo "::set-output name=commit-judgment-name::$COMMIT_JUDGMENT_NAME"
         # Number of microservice
         COMMIT_DIR_COUNT=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq | wc -l)
         COMMIT_DIR_NAME=$(git diff --name-only ${BEFORE_SHA} ${AFTER_SHA} | awk -F/ '{print $2}' | uniq)

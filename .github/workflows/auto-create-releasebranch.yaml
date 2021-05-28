@@ -6,9 +6,23 @@ on:
       - master
 
 jobs:
+  commit-judgment:
+    name: "check job run"
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: check
+        id: check
+        uses: ./.github/actions/update-confirm
   auto-branch-create:
     name: "Release branch create"
     runs-on: ubuntu-latest
+    needs: commit-judgment
     steps:
       - uses: actions/checkout@v2
         with:
@@ -18,39 +32,14 @@ jobs:
         run: |
           U_TIME=$(date +%s%3N)
           echo "::set-output name=u-time::$U_TIME"
-      - name: check
-        id: check
-        uses: ./.github/actions/update-confirm
-      - name: Get Release Target branch
-        run: |
-          COMMIT_COUNT=$(jq -r '.commits[].id' $GITHUB_EVENT_PATH | wc -l)
-          git config --global user.email "pf-msa@dmm.com"
-          git config --global user.name "MSA-SRE-BOT"
-          echo "COMMIT_COUNT: ${COMMIT_COUNT}"
-          git remote update
-          git fetch --all
-          git checkout -b "release/stg/${{steps.unix-time.outputs.u-time}}" origin/stg
-          git branch
-          set +e
-          git cherry-pick ${{steps.check.outputs.before-sha}}..${{steps.check.outputs.after-sha}}; CHERRY_PICK_CODE=$?
-          set -e
-          if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
-            git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
-          else
-            CONFLICT_LIST=$(git diff --name-only | uniq)
-            git checkout --theirs ${CONFLICT_LIST}
-            git add ${CONFLICT_LIST}
-            git commit -m "$(git log --pretty=oneline ${{steps.check.outputs.after-sha}} | grep -B 10000 ${{steps.check.outputs.before-sha}})"
-            git push origin "release/stg/${{steps.unix-time.outputs.u-time}}"
-          fi
-      - name: Create Pull Request
-        uses: repo-sync/pull-request@v2
+      - name: labo-release-create
+        id: labo-release-create
+        uses: ./.github/actions/git-cherry-pick
         with:
-          github_token: ${{ secrets.TOKEN }}
-          pr_title: "Release ${{ github.ref }} into STG"
-          source_branch: "release/${{steps.check.outputs.commit-environment-name}}/${{steps.unix-time.outputs.u-time}}"
-          destination_branch: "${{steps.check.outputs.commit-environment-name}}"
+          cherry_branch_name: "release/labo/${{steps.unix-time.outputs.u-time}}"
+          push_branch_name: "labo"
 
 
 
 
+ 
