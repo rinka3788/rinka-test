@@ -34,7 +34,9 @@ runs:
           set -e
           echo "CHERRY_PICK_CODE: ${CHERRY_PICK_CODE}"
           if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
+            set +e
             TEST=$(git push origin "${{inputs.cherry_branch_name}}" 2>&1 > /dev/null)
+            set -e
             echo "FLAG: ${TEST}"
           else
             CHERRY_PICK_END_FLAG=0
@@ -45,12 +47,16 @@ runs:
                 CONFLICT_LIST=$(git diff --name-only | uniq)
                 CONFLICT_LIST_COUNT=$(git diff --name-only | uniq | wc -l)
                 if [ ${CONFLICT_LIST_COUNT} -eq 0 ]; then
+                  set +e
                   CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
+                  set -e
                 else
                   git checkout --theirs ${CONFLICT_LIST}
                   git add ${CONFLICT_LIST}
                   git commit -m "$(git log --pretty=oneline ${AFTER_SHA} | grep -B 10000 ${BEFORE_SHA}"
+                  set +e
                   CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
+                  set -e
                 fi
               fi
             done
