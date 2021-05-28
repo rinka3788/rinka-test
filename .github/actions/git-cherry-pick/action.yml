@@ -40,8 +40,8 @@ runs:
             set -e
             echo "FLAG: ${TEST}"
           else
-            CHERRY_PICK_END_FLAG=0
             echo "CHERRY_PICK_CODE_FOR: ${CHERRY_PICK_CODE}"
+            CHERRY_PICK_END_FLAG="0"
             for i in `seq ${COMMIT_COUNT}`
             do
               if [ ${CHERRY_PICK_END_FLAG} -ne 1 ]; then
