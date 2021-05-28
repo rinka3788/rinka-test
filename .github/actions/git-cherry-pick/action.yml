@@ -37,6 +37,10 @@ runs:
           else
             echo "CHERRY_PICK_CODE_FOR: ${CHERRY_PICK_CODE}"
             CHERRY_PICK_END_FLAG="0"
+            for i in `seq ${COMMIT_COUNT}`
+            do
+              echo "TEST"
+            done
             git push origin "${{inputs.cherry_branch_name}}"
           fi
           echo "CHERRY_PICK_CODE_FOR2: ${CHERRY_PICK_CODE}"
