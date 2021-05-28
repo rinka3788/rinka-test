@@ -31,17 +31,26 @@ runs:
           git branch
           set +e
           git cherry-pick ${BEFORE_SHA}..${AFTER_SHA}; CHERRY_PICK_CODE=$?
+          set -e
           echo "CHERRY_PICK_CODE: ${CHERRY_PICK_CODE}"
           if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
             git push origin "${{inputs.cherry_branch_name}}"
           else
-            echo "CHERRY_PICK_CODE_FOR: ${CHERRY_PICK_CODE}"
             CHERRY_PICK_END_FLAG="0"
             for i in `seq ${COMMIT_COUNT}`
             do
-              echo "TEST"
+              if [ ${CHERRY_PICK_END_FLAG} -ne 0 ]; then
+                CONFLICT_LIST=$(git diff --name-only | uniq)
+                CONFLICT_LIST_COUNT=$(git diff --name-only | uniq | wc -l)
+                if [ ${CONFLICT_LIST_COUNT} -eq 0 ]; then
+                  CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
+                else
+                  git checkout --theirs ${CONFLICT_LIST}
+                  git add ${CONFLICT_LIST}
+                  git commit -m "$(git log --pretty=oneline ${AFTER_SHA} | grep -B 10000 ${BEFORE_SHA}"
+                  CHERRY_PICK_END_FLAG=$(git cherry-pick --continu 2>&1 > /dev/null | grep -c "no cherry-pick or revert in progress")
+                fi
+              fi
             done
             git push origin "${{inputs.cherry_branch_name}}"
           fi
-          echo "CHERRY_PICK_CODE_FOR2: ${CHERRY_PICK_CODE}"
-          set -e
