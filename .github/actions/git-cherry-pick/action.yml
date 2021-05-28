@@ -34,6 +34,7 @@ runs:
           set -e
           echo "CHERRY_PICK_CODE: ${CHERRY_PICK_CODE}"
           if [ ${CHERRY_PICK_CODE} -eq 0 ]; then
+            echo "FLAG"
             set +e
             TEST=$(git push origin "${{inputs.cherry_branch_name}}" 2>&1 > /dev/null)
             set -e
