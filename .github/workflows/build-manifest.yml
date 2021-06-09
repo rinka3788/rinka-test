@@ -5,11 +5,9 @@ on:
       name:
         description: 'Microservices Name'
         required: true
-        default: ''
       env:
         description: 'Enviroment'
         required: true
-        default: ''
 
 jobs:
   kustomize-build:
@@ -40,7 +38,7 @@ jobs:
           kustomize build microservices/${{github.event.inputs.name}}/overlays/${{github.event.inputs.env}} -o run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}/build-manifest.ymal
           git add run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}/build-manifest.ymal
           git commit -m "Release commit for ${{github.event.inputs.name}} ${{github.event.inputs.env}}"
-          git push origin "${{inputs.cherry_branch_name}}"
+          git push origin "release/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:
