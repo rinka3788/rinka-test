@@ -19,11 +19,11 @@ jobs:
       - name: check
         id: check
         uses: ./.github/actions/update-confirm
-  auto-deploy:
+  auto-deploy-labo:
     name: "Auto Deploy"
     needs: commit-judgment
-    environment: "${{needs.commit-judgment.outputs.commit-environment-name}}"
-    if: "! contains(github.head_ref, "release/${{needs.commit-judgment.outputs.commit-environment-name}}/${{needs.commit-judgment.outputs.commit-dir-name}}")"
+    environment: stg
+    if: "! contains(github.head_ref, "release/${{needs.commit-judgment.outputs.commit-environment-name}}/labo")"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
