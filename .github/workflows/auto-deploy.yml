@@ -12,6 +12,7 @@ jobs:
     outputs:
       commit-environment-name: "${{steps.check.outputs.commit-environment-name}}"
       commit-dir-name: "${{steps.check.outputs.commit-dir-name}}"
+      commit-judgment-name: "${{steps.check.outputs.commit-judgment-name}}"
     steps:
       - uses: actions/checkout@v2
         with:
@@ -24,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: commit-judgment
     environment: stg
-    if: contains(github.head_ref, "release/needs.commit-judgment.outputs.commit-dir-name/needs.commit-judgment.outputs.commit-environment-name")
+    if: contains(github.head_ref, 'release/') && contains(needs.commit-judgment.outputs.commit-judgment-name, 'run-manifests') 
     steps:
       - uses: actions/checkout@v2
         with:
