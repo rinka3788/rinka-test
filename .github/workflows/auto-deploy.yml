@@ -22,7 +22,7 @@ jobs:
   auto-deploy:
     name: "Auto Deploy"
     needs: commit-judgment
-    environment: ${{needs.commit-judgment.outputs.commit-environment-name}}
+    environment: "${{needs.commit-judgment.outputs.commit-environment-name}}"
     if: "! contains(github.head_ref, "release/${{needs.commit-judgment.outputs.commit-environment-name}}/${{needs.commit-judgment.outputs.commit-dir-name}}")"
     runs-on: ubuntu-latest
     steps:
