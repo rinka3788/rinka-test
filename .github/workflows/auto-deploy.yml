@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: commit-judgment
     environment: stg
-    if: contains(github.head_ref, 'release/needs.commit-judgment.outputs.commit-environment-name/labo')
+    if: contains(github.head_ref, 'release/'needs.commit-judgment.outputs.commit-dir-name'/'needs.commit-judgment.outputs.commit-environment-name)
     steps:
       - uses: actions/checkout@v2
         with:
