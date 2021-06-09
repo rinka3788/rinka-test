@@ -10,8 +10,8 @@ jobs:
     name: "check job run"
     runs-on: ubuntu-latest
     outputs:
-      commit-environment-name: ${{steps.check.outputs.commit-environment-name}} 
-      commit-dir-name: ${{steps.check.outputs.commit-dir-name}}
+      commit-environment-name: "${{steps.check.outputs.commit-environment-name}}"
+      commit-dir-name: "${{steps.check.outputs.commit-dir-name}}"
     steps:
       - uses: actions/checkout@v2
         with:
