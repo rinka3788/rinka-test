@@ -1,0 +1,48 @@
+name: kustomize build
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Microservices Name'
+        required: true
+      env:
+        description: 'Enviroment'
+        required: true
+
+jobs:
+  kustomize-build:
+    name: "manifest build and push"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Kustomize
+        run: |
+          apt-get update && apt-get install -y curl
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash -s 4.1.2
+          sudo mv ./kustomize /usr/local/bin/kustomize
+      - id: unix-time
+        name: Get Date
+        run: |
+          U_TIME=$(date +%s%3N)
+          echo "::set-output name=u-time::$U_TIME"
+      - name: Release branch create
+        run: |
+          git config --global user.email "pf-msa@dmm.com"
+          git config --global user.name "MSA-SRE-BOT"
+          git remote update
+          git fetch --all
+          git branch
+          git checkout -b "release/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+          git branch
+          mkdir -p run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}
+          kustomize build microservices/${{github.event.inputs.name}}/overlays/${{github.event.inputs.env}} -o run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}/build-manifest.ymal
+          git add run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}/build-manifest.ymal
+          git commit -m "Release commit for ${{github.event.inputs.name}} ${{github.event.inputs.env}}"
+          git push origin "${{inputs.cherry_branch_name}}"
+      - name: Create Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          pr_title: "Release PR for ${{github.event.inputs.name}} ${{github.event.inputs.env}}"
+          source_branch: "release/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+          destination_branch: master
