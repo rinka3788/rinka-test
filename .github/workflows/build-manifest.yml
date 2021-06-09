@@ -5,9 +5,11 @@ on:
       name:
         description: 'Microservices Name'
         required: true
+        default: ''
       env:
         description: 'Enviroment'
         required: true
+        default: ''
 
 jobs:
   kustomize-build:
