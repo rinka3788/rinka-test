@@ -38,7 +38,13 @@ jobs:
         with:
           cherry_branch_name: "release/labo/${{steps.unix-time.outputs.u-time}}"
           push_branch_name: "labo"
-
+      - name: Create Pull Request for Labo
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          pr_title: "Release ${{ github.ref }} into Labo"
+          source_branch: "release/labo/${{steps.unix-time.outputs.u-time}}"
+          destination_branch: labo
 
 
 
