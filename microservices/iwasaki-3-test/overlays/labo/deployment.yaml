@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pf-microservices-template-first
+  labels:
+    tags.datadoghq.com/env: "labo"
+spec:
+  template:
+    metadata:
+      labels:
+        tags.datadoghq.com/env: "labo"
+    spec:
+      containers:
+        - name: server
+          image: asia-docker.pkg.dev/pf-msa-labo/pf-microservices-template-first/pf-microservices-template-first
+      terminationGracePeriodSeconds: 20
