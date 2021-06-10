@@ -1,0 +1,43 @@
+name: Microservices first commit
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Microservices Name'
+        required: true
+
+jobs:
+  kustomize-build:
+    name: "Microservices first manifest copy and push"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: unix-time
+        name: Get Date
+        run: |
+          U_TIME=$(date +%s%3N)
+          echo "::set-output name=u-time::$U_TIME"
+      - name: Release branch create
+        run: |
+          git config --global user.email "pf-msa@dmm.com"
+          git config --global user.name "MSA-SRE-BOT"
+          git remote update
+          git fetch --all
+          git branch
+          git checkout -b "release/machine/first-deploy/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+          git branch
+          mkdir -p microservices/${{github.event.inputs.name}}
+          cp -pr microservices/pf-microservices-template-first/* microservices/${{github.event.inputs.name}}/
+          find  microservices/${{github.event.inputs.name}}/base/ -type f | xargs sed -i "s/pf-microservices-template-first/${{github.event.inputs.name}}/g"
+          echo "microservices/${{github.event.inputs.name}}/* ${{github.actor}}" >> .github/CODEOWNERS
+          git add microservices/${{github.event.inputs.name}}/*
+          git add .github/CODEOWNERS
+          git commit -m "Microservices first commit for ${{github.event.inputs.name}}"
+          git push origin "release/machine/first-deploy/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+      - name: Create Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          pr_title: "Microservices first PR for ${{github.event.inputs.name}}"
+          source_branch: "release/machine/first-deploy/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+          destination_branch: master

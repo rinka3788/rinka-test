@@ -9,7 +9,7 @@ jobs:
   pr-check:
     name: "PR constraint check"
     runs-on: ubuntu-latest
-    if: (! contains(github.head_ref, 'maintenance-sre/')) || (! contains(github.head_ref, 'release/machine/'))
+    if: ("! contains(github.head_ref, 'maintenance-sre/')") || ("! contains(github.head_ref, 'release/machine/')")
     steps:
       - uses: actions/checkout@v2
         with:
