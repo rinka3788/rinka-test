@@ -32,17 +32,17 @@ jobs:
           git remote update
           git fetch --all
           git branch
-          git checkout -b "release/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+          git checkout -b "release/machine/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
           git branch
           mkdir -p run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}
           kustomize build microservices/${{github.event.inputs.name}}/overlays/${{github.event.inputs.env}} -o run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}/build-manifest.ymal
           git add run-manifests/${{github.event.inputs.name}}/${{github.event.inputs.env}}/build-manifest.ymal
           git commit -m "Release commit for ${{github.event.inputs.name}} ${{github.event.inputs.env}}"
-          git push origin "release/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+          git push origin "release/machine/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.TOKEN }}
           pr_title: "Release PR for ${{github.event.inputs.name}} ${{github.event.inputs.env}}"
-          source_branch: "release/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
+          source_branch: "release/machine/${{github.event.inputs.env}}/${{github.event.inputs.name}}-${{steps.unix-time.outputs.u-time}}"
           destination_branch: master
