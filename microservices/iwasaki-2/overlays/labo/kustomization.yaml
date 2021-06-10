@@ -1,0 +1,6 @@
+resources:
+  - ../../base
+  - hpa.yaml
+patchesStrategicMerge:
+  - deployment.yaml
+namespace: pf-microservices-template-first

@@ -1,0 +1,11 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: iwasaki-2
+  labels:
+    service: pf-authentication-service
+spec:
+  maxUnavailable: "60%"
+  selector:
+    matchLabels:
+      service: iwasaki-2
