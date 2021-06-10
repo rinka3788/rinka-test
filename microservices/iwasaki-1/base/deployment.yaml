@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iwasaki-1
+  labels:
+    service: iwasaki-1
+    tags.datadoghq.com/service: iwasaki-1
+    tags.datadoghq.com/version: "1.0"
+spec:
+  selector:
+    matchLabels:
+      service: iwasaki-1
+  template:
+    metadata:
+      labels:
+        service: iwasaki-1
+        tags.datadoghq.com/service: iwasaki-1
+        tags.datadoghq.com/version: "1.0"
+    spec:
+      containers:
+        - name: server
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+            - name: DD_TRACE_ANALYTICS_ENABLED
+              value: "true"
