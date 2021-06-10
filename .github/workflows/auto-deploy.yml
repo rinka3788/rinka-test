@@ -25,12 +25,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: commit-judgment
     if: "contains(needs.commit-judgment.outputs.commit-judgment-name, 'run-manifests')"
-    environment: stg
+    environment: ${{needs.commit-judgment.outputs.commit-environment-name}}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: test
-        run: |
-          echo "${{github.ref}}"
+      - uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT }}
+      - name: spinnaker-deploy-webhook-request
+        id: spinnaker-deploy-webhook-request
+        uses: ./.github/actions/spinnaker-deploy
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          impersonate_service_account: ${{ secrets.GCP_IMPERSONATE_SA }}
+          spinnaker_client_id: ${{ secrets.SPINNAKER_CLIENT_ID }}
+          spinnaker_webhook_url: ${{ secrets.SPINNAKER_URL }}
+          spinnaker_webhook_source: ${{needs.commit-judgment.outputs.commit-dir-name}}
 
