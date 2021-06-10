@@ -29,7 +29,7 @@ jobs:
           mkdir -p microservices/${{github.event.inputs.name}}
           cp -pr microservices/pf-microservices-template-first/* microservices/${{github.event.inputs.name}}/
           find  microservices/${{github.event.inputs.name}}/base/ -type f | xargs sed -i "s/pf-microservices-template-first/${{github.event.inputs.name}}/g"
-          echo "microservices/${{github.event.inputs.name}}/* ${{github.actor}}" >> .github/CODEOWNERS
+          echo "microservices/${{github.event.inputs.name}}/* @${{github.actor}}" >> .github/CODEOWNERS
           git add microservices/${{github.event.inputs.name}}/*
           git add .github/CODEOWNERS
           git commit -m "Microservices first commit for ${{github.event.inputs.name}}"
