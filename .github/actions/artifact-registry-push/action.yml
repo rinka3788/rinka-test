@@ -1,0 +1,21 @@
+inputs:
+  local_image_name:
+    description: "docker build image name"
+    required: true
+  local_image_tag:
+    description: "docker build image tag"
+  artifact_registry_image_path:
+    description: "docker push destination artifact registry path"
+    required: true
+  artifact_registry_image_push_tag:
+    description: "tag name when pushing "
+    required: true 
+runs:
+  using: "composite"
+  steps:
+    - id: image-push
+      shell: bash
+      run: |
+          gcloud --quiet auth configure-docker asia-docker.pkg.dev
+          docker tag ${{inputs.local_image_name}}:${{inputs.local_image_tag}} ${{inputs.artifact_registry_image_path}}:${{inputs.artifact_registry_image_push_tag}}
+          docker push ${{inputs.artifact_registry_image_path}}:${{inputs.artifact_registry_image_push_tag}}
