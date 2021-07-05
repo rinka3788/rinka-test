@@ -22,7 +22,7 @@ jobs:
       - name: Authenticate cloud SDK
         run: gcloud --quiet auth configure-docker
       - name: push
-        uses: ./.github/actions/update-confirm
+        uses: ./.github/actions/artifact-registry-push
         with:
           local_image_name: "test"
           local_image_tag: "test"
