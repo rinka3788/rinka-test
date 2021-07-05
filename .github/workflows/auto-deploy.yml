@@ -8,6 +8,7 @@ on:
 jobs:
   auto-deploy-labo:
     name: "Auto Deploy"
+    environment: stg
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
