@@ -20,7 +20,9 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT }}
       - name: Authenticate cloud SDK
-        run: gcloud --quiet auth configure-docker
+        run: |
+          gcloud --quiet auth configure-docker
+          gcloud auth list
       - name: push
         uses: ./.github/actions/artifact-registry-push
         with:
