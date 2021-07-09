@@ -63,7 +63,7 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT }}
       - run: |
-          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+          gcloud container clusters get-credentials "${{secrets.GKE_CLUSTER}}" --zone "${{secrets.GKE_ZONE}}"
       - name: validation
         run: |
           kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/rc | kubectl apply -f - --validate --dry-run=server 2>&1 > /dev/null
