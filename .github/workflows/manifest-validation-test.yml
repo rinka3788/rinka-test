@@ -39,6 +39,10 @@ jobs:
           wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
           ls
           tar xf kubeval-linux-amd64.tar.gz
+          ls ~/
+          pwd
+          ls -l
+
       - name: Validation the kustomize
         run: |
           echo "kustomize build result"
