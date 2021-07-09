@@ -1,0 +1,46 @@
+name: Manifest validation test
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  commit-judgment:
+    name: "check job run"
+    runs-on: ubuntu-latest
+    if: "! contains(github.head_ref, 'release/machine/')"
+    outputs:
+      commit-environment-name: "${{steps.check.outputs.commit-environment-name}}"
+      commit-dir-name: "${{steps.check.outputs.commit-dir-name}}"
+      commit-judgment-name: "${{steps.check.outputs.commit-judgment-name}}"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  
+      - name: check
+        id: check
+        uses: ./.github/actions/update-confirm
+  manifest-lint:
+    name: "Manifest lint"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [rc, stg, prd]
+    needs: commit-judgment
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/kustomize-setup
+      - name: kubeval install
+        run: |
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+      - name: Validation the kustomize
+        run: |
+          echo "kustomize build result"
+          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}} 2>&1 > /dev/null
+      - name: Validation the manifest with kubeval
+        run: |
+          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}} | kubeval

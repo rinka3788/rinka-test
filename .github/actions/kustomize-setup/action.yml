@@ -1,0 +1,9 @@
+runs:
+  using: "composite"
+  steps:
+    - id: kustomize-install
+      shell: bash
+      run: |
+        apt-get update && apt-get install -y curl
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash -s 4.2.0
+        sudo mv ./kustomize /usr/local/bin/kustomize
