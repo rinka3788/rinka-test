@@ -35,18 +35,12 @@ jobs:
       - uses: ./.github/actions/kustomize-setup
       - name: kubeval install
         run: |
-          pwd
           wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-          ls
           tar xf kubeval-linux-amd64.tar.gz
-          ls ~/
-          pwd
-          ls -l
-
       - name: Validation the kustomize
         run: |
           echo "kustomize build result"
           kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}} 2>&1 > /dev/null
       - name: Validation the manifest with kubeval
         run: |
-          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}} | kubeval
+          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}} | ./kubeval
