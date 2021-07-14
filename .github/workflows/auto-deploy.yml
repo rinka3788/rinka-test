@@ -24,11 +24,3 @@ jobs:
         run: |
           gcloud --quiet auth configure-docker
           gcloud auth list
-      - name: push
-        uses: ./.github/actions/artifact-registry-push
-        with:
-          local_image_name: "test"
-          local_image_tag: "test"
-          artifact_registry_image_path: "asia-docker.pkg.dev/dm2-gw-219813/pf-authentication-service/pf-authentication-service"
-          artifact_registry_image_push_tag: "1234"
-
