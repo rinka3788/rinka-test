@@ -1,0 +1,71 @@
+name: Scheduling the Generated Manifest validation test action
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  create-service-list:
+    name: "Generated manifest directory to service list create"
+    runs-on: ubuntu-latest
+    outputs:
+      service-list: "${{steps.create-list.outputs.service-list}}"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  
+      - name: create-list
+        run: |
+          SERVICE_LIST=`ls -dm run-manifests/*`
+          echo "::set-output name=service-list::$SERVICE_LIST"
+
+  manifest-lint:
+    name: "Manifest lint"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [rc, stg, prd]
+    needs: commit-judgment
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/kustomize-setup
+      - name: kubeval install
+        run: |
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+          sudo mv ./kubeval /usr/local/bin/kubeval
+      - name: Validation the kustomize
+        run: |
+          echo "kustomize build result"
+          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}} 2>&1 > /dev/null
+      - name: Validation the manifest with kubeval
+        run: |
+          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}} | kubeval
+
+
+
+  manifest-rc-k8s-api-test:
+    name: "Manifest API test"
+    runs-on: ubuntu-latest
+    needs: [commit-judgment, manifest-lint]
+    strategy:
+      matrix:
+        env: [${{needs.create-service-list.outputs.service-list}}]
+    environment: stg
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/kustomize-setup
+      - uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT }}
+      - run: |
+          gcloud container clusters get-credentials "${{secrets.GKE_CLUSTER}}" --zone "${{secrets.GKE_ZONE}}"
+      - name: validation
+        run: |
+          kubectl apply -f ${{needs.create-service-list.outputs.service-list}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
