@@ -66,4 +66,4 @@ jobs:
           gcloud container clusters get-credentials "${{secrets.GKE_CLUSTER}}" --zone "${{secrets.GKE_ZONE}}"
       - name: validation
         run: |
-          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/rc | kubectl apply -f - --validate --dry-run=server 2>&1 > /dev/null
+          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}}  | kubectl apply -f - --validate --dry-run=server 2>&1 > /dev/null
