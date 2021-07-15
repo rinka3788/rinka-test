@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pf-microservices-template-first
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service
+  namespace: pf-microservices-template-first
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    service: pf-microservices-template-first
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: pf-microservices-template-first
+    tags.datadoghq.com/env: labo
+    tags.datadoghq.com/service: pf-microservices-template-first
+    tags.datadoghq.com/version: "1.0"
+  name: pf-microservices-template-first
+  namespace: pf-microservices-template-first
+spec:
+  selector:
+    matchLabels:
+      service: pf-microservices-template-first
+  template:
+    metadata:
+      labels:
+        service: pf-microservices-template-first
+        tags.datadoghq.com/env: labo
+        tags.datadoghq.com/service: pf-microservices-template-first
+        tags.datadoghq.com/version: "1.0"
+    spec:
+      containers:
+      - env:
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        - name: DD_TRACE_ANALYTICS_ENABLED
+          value: "true"
+        image: asia-docker.pkg.dev/pf-msa-labo/pf-microservices-template-first/pf-microservices-template-first
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+        name: server
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+          requests:
+            cpu: 1000m
+            memory: 512Mi
+      terminationGracePeriodSeconds: 20
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    service: pf-authentication-service
+  name: pf-microservices-template-first
+  namespace: pf-microservices-template-first
+spec:
+  maxUnavailable: 60%
+  selector:
+    matchLabels:
+      service: pf-microservices-template-first
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: pf-microservices-template-first
+  namespace: pf-microservices-template-first
+spec:
+  maxReplicas: 10
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 30
+        type: Utilization
+    type: Resource
+  minReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: pf-microservices-template-first
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.global-static-ip-name: pf-microservices-template-first
+  name: pf-microservices-template-first
+  namespace: pf-microservices-template-first
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: service
+          servicePort: 8080
+        path: /*
