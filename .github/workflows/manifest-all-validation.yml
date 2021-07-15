@@ -45,3 +45,13 @@ jobs:
           echo "${{matrix.filename}}"
           echo "${{needs.create-service-list.outputs.service-list}}"
           kubectl apply -f ${{matrix.filename}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
+  slack-notify:
+    if: always()
+    needs: [manifest-k8s-api-test]
+    name: workflow notification to slack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Gamesight/slack-workflow-status@master
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
