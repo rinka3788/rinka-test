@@ -41,4 +41,4 @@ jobs:
           gcloud container clusters get-credentials "${{secrets.GKE_CLUSTER}}" --zone "${{secrets.GKE_ZONE}}"
       - name: validation
         run: |
-          kubectl apply -f ${{needs.create-service-list.outputs.service-list}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
+          kubectl apply -f ${{matrix.env}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
