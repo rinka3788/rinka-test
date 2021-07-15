@@ -26,7 +26,7 @@ jobs:
     needs: [create-service-list]
     strategy:
       matrix:
-        env: "${{needs.create-service-list.outputs.service-list}}"
+        env: [${{needs.create-service-list.outputs.service-list}}]
     environment: stg
     steps:
       - uses: actions/checkout@v2
