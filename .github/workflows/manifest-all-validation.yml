@@ -42,4 +42,5 @@ jobs:
       - name: validation
         run: |
           echo "${{matrix.env}}"
+          echo "${{needs.create-service-list.outputs.service-list}}"
           kubectl apply -f ${{matrix.env}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
