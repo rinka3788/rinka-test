@@ -17,7 +17,8 @@ jobs:
       - name: create-list
         id: create-list
         run: |
-          SERVICE_LIST="[`ls -dm run-manifests/*`]"
+          apt-get install jc
+          SERVICE_LIST="{\"include\": `ls -d run-manifests/* | jc --ls`}"
           echo "${SERVICE_LIST}"
           echo "::set-output name=service-list::$SERVICE_LIST"
 
@@ -26,8 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [create-service-list]
     strategy:
-      matrix:
-        env: ${{fromJSON(needs.create-service-list.outputs.service-list)}}
+      matrix: ${{fromJSON(needs.create-service-list.outputs.service-list)}}
     environment: stg
     steps:
       - uses: actions/checkout@v2
@@ -42,6 +42,6 @@ jobs:
           gcloud container clusters get-credentials "${{secrets.GKE_CLUSTER}}" --zone "${{secrets.GKE_ZONE}}"
       - name: validation
         run: |
-          echo "${{matrix.env}}"
+          echo "${{matrix.filename}}"
           echo "${{needs.create-service-list.outputs.service-list}}"
-          kubectl apply -f ${{matrix.env}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
+          kubectl apply -f ${{matrix.filename}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
