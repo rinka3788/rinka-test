@@ -15,6 +15,7 @@ jobs:
         with:
           fetch-depth: 0  
       - name: create-list
+        id: create-list
         run: |
           SERVICE_LIST=`ls -dm run-manifests/*`
           echo "${SERVICE_LIST}"
