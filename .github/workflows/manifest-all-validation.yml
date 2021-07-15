@@ -20,7 +20,7 @@ jobs:
           SERVICE_LIST=`ls -dm run-manifests/*`
           echo "::set-output name=service-list::$SERVICE_LIST"
 
-  manifest-rc-k8s-api-test:
+  manifest-k8s-api-test:
     name: "Manifest API test"
     runs-on: ubuntu-latest
     needs: [create-service-list]
