@@ -17,7 +17,7 @@ jobs:
       - name: create-list
         id: create-list
         run: |
-          apt-get install jc
+          sudo apt-get install jc
           SERVICE_LIST="{\"include\": `ls -d run-manifests/* | jc --ls`}"
           echo "${SERVICE_LIST}"
           echo "::set-output name=service-list::$SERVICE_LIST"
