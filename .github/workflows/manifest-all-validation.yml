@@ -17,6 +17,7 @@ jobs:
       - name: create-list
         run: |
           SERVICE_LIST=`ls -dm run-manifests/*`
+          echo "${SERVICE_LIST}"
           echo "::set-output name=service-list::$SERVICE_LIST"
 
   manifest-k8s-api-test:
