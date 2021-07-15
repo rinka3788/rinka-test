@@ -17,7 +17,7 @@ jobs:
       - name: create-list
         id: create-list
         run: |
-          sudo apt-get install jc
+          sudo pip3 install jc
           SERVICE_LIST="{\"include\": `ls -d run-manifests/* | jc --ls`}"
           echo "${SERVICE_LIST}"
           echo "::set-output name=service-list::$SERVICE_LIST"
