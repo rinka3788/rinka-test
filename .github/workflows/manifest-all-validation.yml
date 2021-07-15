@@ -1,10 +1,9 @@
 name: Scheduling the Generated Manifest validation test action
 
 on:
-  pull_request:
+  push:
     branches:
       - master
-
 jobs:
   create-service-list:
     name: "Generated manifest directory to service list create"
