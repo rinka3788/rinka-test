@@ -17,7 +17,7 @@ jobs:
       - name: create-list
         id: create-list
         run: |
-          SERVICE_LIST=`ls -dm run-manifests/*`
+          SERVICE_LIST="[`ls -dm run-manifests/*`]"
           echo "${SERVICE_LIST}"
           echo "::set-output name=service-list::$SERVICE_LIST"
 
@@ -27,7 +27,7 @@ jobs:
     needs: [create-service-list]
     strategy:
       matrix:
-        env: ["${{needs.create-service-list.outputs.service-list}}"]
+        env: ${{fromJSON(needs.create-service-list.outputs.service-list)}}
     environment: stg
     steps:
       - uses: actions/checkout@v2
