@@ -65,5 +65,22 @@ jobs:
       - run: |
           gcloud container clusters get-credentials "${{secrets.GKE_CLUSTER}}" --zone "${{secrets.GKE_ZONE}}"
       - name: validation
+        id: validation
         run: |
-          kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}}  | kubectl apply -f - --validate --dry-run=server 2>&1 > /dev/null
+          K8S_APPLY_MESSAGE=$(kustomize build ./microservices/${{needs.commit-judgment.outputs.commit-dir-name}}/overlays/${{matrix.env}}  | kubectl apply -f - --validate --dry-run=server 2>&1 > /dev/null)
+          echo "${K8S_APPLY_MESSAGE}"
+          echo "::set-output name=k8s-apply-message::$K8S_APPLY_MESSAGE"
+      - name: Post comments
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{secrets.TOKEN}}
+          URL: ${{github.event.pull_request.comments_url}}
+        run: |
+          if [ -n "${{steps.validation.outputs.k8s-apply-message}}" ]; then 
+            TEST="API Test Error and Warning List¥nWarningは非推奨項目のためマージ可能ですが直すようにしてください。¥n${{steps.validation.outputs.k8s-apply-message}}"
+            curl -X POST \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H 'content-type: application/json' \
+              -d "{\"body\": \" ${TEST}\"}" \
+              ${URL}
+          fi
