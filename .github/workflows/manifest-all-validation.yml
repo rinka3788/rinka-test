@@ -27,7 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [create-service-list]
     strategy:
-      matrix: ${{fromJSON(needs.create-service-list.outputs.service-list)}}
+      matrix: 
+        filename: ${{fromJSON(needs.create-service-list.outputs.service-list)}}
+        env: [rc, stg, prd]
     environment: stg
     steps:
       - uses: actions/checkout@v2
@@ -45,13 +47,3 @@ jobs:
           echo "${{matrix.filename}}"
           echo "${{needs.create-service-list.outputs.service-list}}"
           kubectl apply -f ${{matrix.filename}}/stg/build-manifest.ymal --validate --dry-run=server 2>&1 > /dev/null
-  slack-notify:
-    if: always()
-    needs: [manifest-k8s-api-test]
-    name: workflow notification to slack
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Gamesight/slack-workflow-status@master
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
